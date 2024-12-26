@@ -8,6 +8,7 @@ const initialState = {
 
 const Home = () => {
   const [form, setForm] = useState(initialState);
+  const [shortUrl, setShortUrl] = useState('');
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,16 +17,15 @@ const Home = () => {
       originalUrl: form.link,
     }
 
-    await axiosApi.post('/links', newUrl);
+    const response = await axiosApi.post('/links', newUrl);
+    setShortUrl(response.data.shortUrl);
     setForm(initialState);
     toast.success('Link was successfully shortened!');
+    console.log(response.data.shortUrl);
   };
-  //
-  // const getShortUrl = (shortUrl: string) => {
-  //
-  // };
-  //
-  // const shortUrl = 'http://localhost:8000/shortUrl';
+
+  const result = `http://localhost:8000/${shortUrl}`;
+
 
   return (
     <div className='mt-3'>
@@ -49,7 +49,7 @@ const Home = () => {
 
       <h3>Your link now looks like this: </h3>
 
-
+      {shortUrl && <a href='#' target="_blank" rel="noreferrer">{result}</a>}
     </div>
   );
 };
