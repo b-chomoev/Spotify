@@ -32,4 +32,26 @@ linksRouter.post('/',  async (req, res, next) => {
     }
 });
 
+linksRouter.get('/:shortUrl', async (req, res, next) => {
+    const shortUrl = req.params.shortUrl;
+
+    if (!shortUrl) {
+        res.status(400).send({error: 'ShortUrl must be present in the request'});
+        return;
+    }
+
+    try {
+        const link = await Link.findOne({shortUrl});
+
+        if (!link) {
+            res.status(404).send({error: 'Link not found'});
+            return;
+        }
+
+        res.status(301).redirect(link.originalUrl as string);
+    } catch (e) {
+        next(e);
+    }
+});
+
 export default linksRouter;
