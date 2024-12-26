@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axiosApi from '../../axiosApi';
+import { toast } from 'react-toastify';
 
 const initialState = {
   link: '',
@@ -7,10 +9,23 @@ const initialState = {
 const Home = () => {
   const [form, setForm] = useState(initialState);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(form);
+
+    const newUrl = {
+      originalUrl: form.link,
+    }
+
+    await axiosApi.post('/links', newUrl);
+    setForm(initialState);
+    toast.success('Link was successfully shortened!');
   };
+  //
+  // const getShortUrl = (shortUrl: string) => {
+  //
+  // };
+  //
+  // const shortUrl = 'http://localhost:8000/shortUrl';
 
   return (
     <div className='mt-3'>
@@ -33,6 +48,7 @@ const Home = () => {
       <hr/>
 
       <h3>Your link now looks like this: </h3>
+
 
     </div>
   );
