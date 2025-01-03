@@ -5,6 +5,28 @@ import Album from "../models/Album";
 
 const albumRouter = express.Router();
 
+albumRouter.get('/', async (req, res, next) => {
+    const albumArtistQuery = req.query.artist;
+
+    try {
+
+        if (albumArtistQuery) {
+            const albums = await Album.find({artist: albumArtistQuery});
+            res.send(albums);
+            return;
+        }
+
+        const albums = await Album.find();
+        res.send(albums);
+    } catch (e) {
+        next(e);
+    }
+});
+
+albumRouter.get('/:id', async (req, res, next) => {
+    const id = req.params.id;
+});
+
 albumRouter.post('/', imagesUpload.single('image'), async (req, res, next) => {
     if (req.body.artist) {
         const artist = await Artist.findById(req.body.artist);
