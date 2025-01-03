@@ -25,6 +25,16 @@ albumRouter.get('/', async (req, res, next) => {
 
 albumRouter.get('/:id', async (req, res, next) => {
     const id = req.params.id;
+
+    try {
+        const album = await Album.findById(id);
+
+        if (!album) res.status(404).send({error: 'Album not found'});
+
+        res.send(album);
+    } catch (e) {
+        next(e);
+    }
 });
 
 albumRouter.post('/', imagesUpload.single('image'), async (req, res, next) => {
