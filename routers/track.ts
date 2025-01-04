@@ -4,6 +4,23 @@ import Track from "../models/Track";
 
 const trackRouter = express.Router();
 
+trackRouter.get('/', async (req, res, next) => {
+    const albumQuery = req.query.album;
+
+    try {
+        if (albumQuery) {
+            const tracks = await Track.find({album: albumQuery}).populate('album', '-_id name artist');
+            res.send(tracks);
+            return;
+        }
+
+        const tracks = await Track.find();
+        res.send(tracks);
+    } catch (e) {
+        next(e);
+    }
+});
+
 trackRouter.post('/', async (req, res, next) => {
     if (req.body.album) {
         const album = await Album.findById(req.body.album);
