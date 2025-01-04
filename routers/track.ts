@@ -9,12 +9,12 @@ trackRouter.get('/', async (req, res, next) => {
 
     try {
         if (albumQuery) {
-            const tracks = await Track.find({album: albumQuery}).populate('album', '-_id name artist');
+            const tracks = await Track.find({album: albumQuery});
             res.send(tracks);
             return;
         }
 
-        const tracks = await Track.find();
+        const tracks = await Track.find().select('-__v');
         res.send(tracks);
     } catch (e) {
         next(e);
