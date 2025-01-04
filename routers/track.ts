@@ -9,7 +9,7 @@ trackRouter.get('/', async (req, res, next) => {
 
     try {
         if (albumQuery) {
-            const tracks = await Track.find({album: albumQuery});
+            const tracks = await Track.find({album: albumQuery}).populate('album', '-_id name');
             res.send(tracks);
             return;
         }
