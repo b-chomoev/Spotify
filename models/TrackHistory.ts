@@ -11,7 +11,7 @@ const TrackHistorySchema = new Schema({
     track: {
         type: Schema.Types.ObjectId,
         ref: 'Track',
-        required: true,
+        required: [true, 'Track ID is required'],
     },
     datetime: {
         type: Date,
