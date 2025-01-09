@@ -26,6 +26,11 @@ const Home = () => {
 
   const result = `http://localhost:8000/${shortUrl}`;
 
+  const redirectOfShortUrl = async () => {
+    const response = await axiosApi.get(`/links/${shortUrl}`);
+    return response.data;
+  };
+
 
   return (
     <div className='mt-3'>
@@ -49,7 +54,7 @@ const Home = () => {
 
       <h3>Your link now looks like this: </h3>
 
-      {shortUrl && <a href='#' target="_blank" rel="noreferrer">{result}</a>}
+      {shortUrl && <a href='#' onClick={redirectOfShortUrl} target="_blank" rel="noreferrer">{result}</a>}
     </div>
   );
 };
