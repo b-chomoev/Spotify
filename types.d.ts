@@ -17,3 +17,15 @@ export interface Track {
     album: string;
     duration: string;
 }
+
+export interface UserField {
+    username: string;
+    password: string;
+    token: string;
+}
+
+export interface TrackHistory {
+    _id: string;
+    track: string;
+    datetime: string;
+}
