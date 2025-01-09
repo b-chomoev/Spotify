@@ -2,35 +2,23 @@ import React, { useState } from 'react';
 import axiosApi from '../../axiosApi';
 import { toast } from 'react-toastify';
 
-const initialState = {
-  link: '',
+interface Link {
+  shortUrl: string;
+  originalUrl: string;
 }
 
 const Home = () => {
-  const [form, setForm] = useState(initialState);
-  const [shortUrl, setShortUrl] = useState('');
+  const [form, setForm] = useState<string>('');
+  const [data, setData] = useState<Link | null>(null);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newUrl = {
-      originalUrl: form.link,
-    }
-
-    const response = await axiosApi.post('/links', newUrl);
-    setShortUrl(response.data.shortUrl);
-    setForm(initialState);
+    const response: {data: Link} = await axiosApi.post('/links', {originalUrl: form});
+    setData(response.data || null);
     toast.success('Link was successfully shortened!');
-    console.log(response.data.shortUrl);
+    console.log(response.data);
   };
-
-  const result = `http://localhost:8000/${shortUrl}`;
-
-  const redirectOfShortUrl = async () => {
-    const response = await axiosApi.get(`/links/${shortUrl}`);
-    return response.data;
-  };
-
 
   return (
     <div className='mt-3'>
@@ -39,12 +27,9 @@ const Home = () => {
         <div className="mb-3">
           <label htmlFor="link" className="form-label">Enter your link</label>
           <input
-            type="url"
             className="form-control"
-            id="link"
-            name={'link'}
-            value={form.link}
-            onChange={(e) => setForm({...form, link: e.target.value})}
+            value={form}
+            onChange={(e) => setForm(e.target.value)}
           />
         </div>
         <button type="submit" className="btn btn-primary">Shorten!</button>
@@ -52,9 +37,17 @@ const Home = () => {
 
       <hr/>
 
-      <h3>Your link now looks like this: </h3>
+      {data ?
 
-      {shortUrl && <a href='#' onClick={redirectOfShortUrl} target="_blank" rel="noreferrer">{result}</a>}
+        <>
+          <h3>Your link now looks like this: </h3>
+          <a target='_blank' href={`http://localhost:8000/links/${data.shortUrl}`}>
+            {`http://localhost:8000/links/${data.shortUrl}`}
+          </a>
+        </>
+        :
+        null
+      }
     </div>
   );
 };
