@@ -1,10 +1,14 @@
 import express from "express";
-import {ILinkMutation} from "../types";
 import Link from "../models/Links";
 
 const linksRouter = express.Router();
 
 linksRouter.post('/',  async (req, res, next) => {
+    if (!req.body.originalUrl) {
+        res.status(400).send({error: 'Original URL must be present in the request'});
+        return;
+    }
+
     const generateShortUrl = (length = 7) => {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         let shortUrl = '';
@@ -16,17 +20,26 @@ linksRouter.post('/',  async (req, res, next) => {
         return shortUrl;
     }
 
-    const shortUrl = generateShortUrl();
+    let shortUrl = null;
+    let isUnique = false;
 
-    const result: ILinkMutation  = {
-        shortUrl: shortUrl,
-        originalUrl: req.body.originalUrl,
+    while (!isUnique) {
+        shortUrl = generateShortUrl();
+        const existingLink = await Link.findOne({shortUrl});
+
+        if (!existingLink) {
+            isUnique = true;
+        }
     }
 
+    const newLink = new Link({
+        shortUrl: shortUrl,
+        originalUrl: req.body.originalUrl,
+    });
+
     try {
-        const link = new Link(result);
-        await link.save();
-        res.send(link);
+        await newLink.save();
+        res.send(newLink);
     } catch (e) {
         next(e);
     }
@@ -41,14 +54,14 @@ linksRouter.get('/:shortUrl', async (req, res, next) => {
     }
 
     try {
-        const link = await Link.findOne({shortUrl});
+        const link = await Link.find({shortUrl});
 
         if (!link) {
             res.status(404).send({error: 'Link not found'});
             return;
         }
 
-        res.status(301).redirect(link.originalUrl as string);
+        res.status(301).redirect(link[0].originalUrl);
     } catch (e) {
         next(e);
     }
